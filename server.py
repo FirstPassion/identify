@@ -9,7 +9,8 @@ from model import Net, transform
 
 app = Flask(__name__)
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-
+net = Net().to(device)
+net.load_state_dict(torch.load('one.pth'))
 
 @app.route("/")
 def index():
@@ -29,8 +30,6 @@ def upload():
 
 # 识别图片是猫还是狗
 def resolutionImg(img):
-    net = Net().to(device)
-    net.load_state_dict(torch.load('one.pth'))
     labels = ['猫', '狗']
     img = transform(img)
     img = img.unsqueeze(0)
