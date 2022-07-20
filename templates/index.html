@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>猫狗识别</title>
+</head>
+<body>
+<img style="width: 128px;height: 128px;" src="" alt=""/>
+<form action="http://localhost:9999/upload" method="POST" enctype="multipart/form-data">
+    <input type="file" name="file"/>
+    <input type="submit" value="识别图片是猫还是狗"/>
+</form>
+<p></p>
+<script>
+    const img = document.querySelector('img')
+    const file = document.querySelector('input[type="file"]')
+    const form = document.querySelector('form')
+    const p = document.querySelector('p')
+    let fileData;
+
+    file.onchange = e => {
+        fileData = e.target.files[0]
+        img.src = URL.createObjectURL(fileData)
+    }
+
+    form.onsubmit = (e) => {
+        e.preventDefault()
+        p.textContent = '正在识别,请等待...'
+        const upFileData = new FormData()
+        upFileData.append('file', fileData)
+        fetch('/upload', {
+            method: 'POST',
+            body: upFileData
+        }).then(res => res.text())
+            .then(res => {
+                p.textContent = '识别结果为 => ' + res
+            }).catch(err => {
+            console.log(err)
+        })
+    }
+</script>
+</body>
+</html>
