@@ -3,24 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <title>猫狗识别</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .image-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        img {
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            display: none; /* 初始隐藏图片 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 128px;
+            height: 128px;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px solid #5cb85c;
+            border-radius: 5px;
+            background-color: #e7f9e7;
+            display: inline-block;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            transition: transform 0.3s;
+        }
+        .result:hover {
+            transform: scale(1.05); /* 鼠标悬停时放大效果 */
+        }
+        input[type="file"] {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 200px;
+        }
+        input[type="submit"] {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        input[type="submit"]:hover {
+            background-color: #4cae4c;
+        }
+    </style>
 </head>
 <body>
-<img style="width: 128px;height: 128px;" src="" alt=""/>
+<h1>猫狗识别系统</h1>
+<div class="image-container">
+    <img src="" alt=""/>
+</div>
 <form action="http://localhost:9999/upload" method="POST" enctype="multipart/form-data">
-    <input type="file" name="file"/>
+    <input type="file" name="file" accept="image/*"/>
     <input type="submit" value="识别图片是猫还是狗"/>
 </form>
-<p></p>
+<p class="result"></p>
 <script>
     const img = document.querySelector('img')
     const file = document.querySelector('input[type="file"]')
     const form = document.querySelector('form')
-    const p = document.querySelector('p')
+    const p = document.querySelector('.result')
     let fileData;
 
     file.onchange = e => {
         fileData = e.target.files[0]
         img.src = URL.createObjectURL(fileData)
+        img.style.display = 'block'; // 显示图片
     }
 
     form.onsubmit = (e) => {
@@ -31,12 +97,12 @@
         fetch('/upload', {
             method: 'POST',
             body: upFileData
-        }).then(res => res.text())
+        }).then(res => res.json())
             .then(res => {
-                p.textContent = '识别结果为 => ' + res
+                p.textContent = '识别结果为 => ' + res.predicted_class + ' (置信度: ' + res.confidence.toFixed(2) + ')'
             }).catch(err => {
-            console.log(err)
-        })
+                console.log(err)
+            })
     }
 </script>
 </body>
