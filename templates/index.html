@@ -1,109 +1,238 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
     <meta charset="UTF-8">
     <title>猫狗识别</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f4f4f4;
+            background-color: #f0f8ff;
+            /* 浅蓝色背景 */
             margin: 0;
             padding: 20px;
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-        .image-container {
-            margin-top: 20px;
             display: flex;
             justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
+
+        .container {
+            display: flex;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            max-width: 900px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .left-panel {
+            flex: 1;
+            padding: 25px;
+            border-right: 2px solid #ff6f61;
+            /* 珊瑚红色分隔线 */
+        }
+
+        .right-panel {
+            flex: 1;
+            padding: 25px;
+            background-color: #fff3e6;
+            /* 浅橙色背景 */
+        }
+
+        h1 {
+            color: #ff6f61;
+            /* 珊瑚红色 */
+            margin-bottom: 20px;
+            font-size: 28px;
+            text-align: center;
+        }
+
+        .image-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
         img {
-            border: 2px solid #ccc;
-            border-radius: 10px;
-            display: none; /* 初始隐藏图片 */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 128px;
-            height: 128px;
+            border: 4px solid #ff6f61;
+            /* 珊瑚红色边框 */
+            border-radius: 15px;
+            display: none;
+            /* 初始隐藏图片 */
+            max-width: 100%;
+            max-height: 300px;
+            width: auto;
+            height: auto;
+            margin-bottom: 20px;
         }
-        .result {
-            margin-top: 20px;
-            padding: 15px;
-            border: 2px solid #5cb85c;
-            border-radius: 5px;
-            background-color: #e7f9e7;
-            display: inline-block;
-            font-size: 20px;
-            font-weight: bold;
+
+        .loading {
+            display: none;
+            /* 初始隐藏加载动画 */
+            font-size: 18px;
             color: #333;
-            transition: transform 0.3s;
+            margin-bottom: 20px;
+            text-align: center;
         }
-        .result:hover {
-            transform: scale(1.05); /* 鼠标悬停时放大效果 */
+
+        .result-card {
+            margin-bottom: 20px;
         }
+
+        .result-card h2 {
+            margin: 0 0 10px 0;
+            font-size: 22px;
+            color: #ff6f61;
+            /* 珊瑚红色 */
+        }
+
+        .result-card p {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .predictions-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 20px;
+            color: #00bcd4;
+            /* 青色 */
+        }
+
+        .predictions-card ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .predictions-card li {
+            margin: 8px 0;
+            font-size: 16px;
+            color: #555;
+        }
+
         input[type="file"] {
-            margin-top: 20px;
+            margin-top: 10px;
             padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 200px;
+            border: 2px solid #ff6f61;
+            /* 珊瑚红色边框 */
+            border-radius: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 16px;
+            color: #333;
         }
+
         input[type="submit"] {
             margin-top: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #5cb85c;
+            padding: 12px 20px;
+            font-size: 18px;
+            background-color: #ff6f61;
+            /* 珊瑚红色 */
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
             cursor: pointer;
+            width: 100%;
             transition: background-color 0.3s;
         }
+
         input[type="submit"]:hover {
-            background-color: #4cae4c;
+            background-color: #ff4a3d;
+            /* 更深的珊瑚红色 */
         }
     </style>
 </head>
+
 <body>
-<h1>猫狗识别系统</h1>
-<div class="image-container">
-    <img src="" alt=""/>
-</div>
-<form action="http://localhost:9999/upload" method="POST" enctype="multipart/form-data">
-    <input type="file" name="file" accept="image/*"/>
-    <input type="submit" value="识别图片是猫还是狗"/>
-</form>
-<p class="result"></p>
-<script>
-    const img = document.querySelector('img')
-    const file = document.querySelector('input[type="file"]')
-    const form = document.querySelector('form')
-    const p = document.querySelector('.result')
-    let fileData;
+    <div class="container">
+        <!-- 左边面板：图片和操作区域 -->
+        <div class="left-panel">
+            <h1>🐱 猫狗识别系统 🐶</h1>
+            <div class="image-container">
+                <img src="" alt="" />
+            </div>
+            <input type="file" name="file" accept="image/*" />
+            <input type="submit" value="识别图片是猫还是狗" />
+            <div class="loading">正在识别，请稍候...</div>
+        </div>
 
-    file.onchange = e => {
-        fileData = e.target.files[0]
-        img.src = URL.createObjectURL(fileData)
-        img.style.display = 'block'; // 显示图片
-    }
+        <!-- 右边面板：识别结果和预测结果 -->
+        <div class="right-panel">
+            <div class="result-card">
+                <h2>识别结果</h2>
+                <p class="result"></p>
+            </div>
+            <div class="predictions-card">
+                <h3>预测结果</h3>
+                <ul>
+                    <li>预测结果 1: <span class="prediction-1"></span></li>
+                    <li>预测结果 2: <span class="prediction-2"></span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script>
+        const img = document.querySelector('img');
+        const fileInput = document.querySelector('input[type="file"]');
+        const submitButton = document.querySelector('input[type="submit"]');
+        const loading = document.querySelector('.loading');
+        const resultText = document.querySelector('.result');
+        const prediction1 = document.querySelector('.prediction-1');
+        const prediction2 = document.querySelector('.prediction-2');
+        let fileData;
 
-    form.onsubmit = (e) => {
-        e.preventDefault()
-        p.textContent = '正在识别,请等待...'
-        const upFileData = new FormData()
-        upFileData.append('file', fileData)
-        fetch('/upload', {
-            method: 'POST',
-            body: upFileData
-        }).then(res => res.json())
-            .then(res => {
-                p.textContent = '识别结果为 => ' + res.predicted_class + ' (置信度: ' + res.confidence.toFixed(2) + ')'
-            }).catch(err => {
-                console.log(err)
+        // 文件选择事件
+        fileInput.onchange = (e) => {
+            fileData = e.target.files[0];
+            img.src = URL.createObjectURL(fileData);
+            img.style.display = 'block'; // 显示图片
+            resultText.textContent = ''; // 清空结果
+            prediction1.textContent = ''; // 清空预测结果
+            prediction2.textContent = ''; // 清空预测结果
+        };
+
+        // 提交按钮点击事件
+        submitButton.onclick = (e) => {
+            e.preventDefault();
+            if (!fileData) {
+                alert('请先选择图片！');
+                return;
+            }
+
+            loading.style.display = 'block'; // 显示加载动画
+            resultText.textContent = ''; // 清空结果
+            prediction1.textContent = ''; // 清空预测结果
+            prediction2.textContent = ''; // 清空预测结果
+
+            const formData = new FormData();
+            formData.append('file', fileData);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
             })
-    }
-</script>
+                .then((res) => res.json())
+                .then((res) => {
+                    loading.style.display = 'none'; // 隐藏加载动画
+                    if (res.error) {
+                        resultText.textContent = '错误: ' + res.error;
+                    } else if (res.predicted_class === '未知') {
+                        resultText.textContent = '未知 (置信度: ' + res.confidence + ')';
+                    } else {
+                        resultText.textContent = res.top_prediction.class + ' (置信度: ' + res.top_prediction.confidence + ')';
+                        prediction1.textContent = res.top_prediction.class + ' (置信度: ' + res.top_prediction.confidence + ')';
+                        prediction2.textContent = res.second_prediction.class + ' (置信度: ' + res.second_prediction.confidence + ')';
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                    loading.style.display = 'none'; // 隐藏加载动画
+                    resultText.textContent = '请求失败，请重试';
+                });
+        };
+    </script>
 </body>
+
 </html>
